@@ -8,9 +8,8 @@ import {
   movePlayer, shootBullet, applyUpgrade,
   checkFoodCollisions, updateBullets,
   getLeaderboard, getGameState,
-  respawnPlayer, playerDied,
+  respawnPlayer,
 } from './gameLoop.js';
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const httpServer = createServer(app);
@@ -19,21 +18,16 @@ const io = new Server(httpServer, {
   pingInterval: 10000,
   pingTimeout: 5000,
 });
-
-app.use(express.static(join(__dirname, '../client')));
-
+app.use(express.static(join(__dirname, 'client')));
 initFood();
-
 const inputs = {};
 const rooms = new Map();
-
 function generateRoomCode() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = '';
   for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
   return code;
 }
-
 function createRoom(hostId, nickname) {
   const code = generateRoomCode();
   const room = {
@@ -45,7 +39,6 @@ function createRoom(hostId, nickname) {
   rooms.set(code, room);
   return room;
 }
-
 function getRoomState(code) {
   const room = rooms.get(code);
   if (!room) return null;
@@ -56,10 +49,8 @@ function getRoomState(code) {
     state: room.state,
   };
 }
-
 io.on('connection', (socket) => {
   console.log(`[CONNECTED] ${socket.id}`);
-
   socket.on('createRoom', (nickname) => {
     const name = String(nickname).trim().slice(0, 16) || 'Tank';
     const room = createRoom(socket.id, name);
@@ -67,7 +58,6 @@ io.on('connection', (socket) => {
     socket.emit('roomCreated', getRoomState(room.code));
     console.log(`[ROOM CREATED] ${room.code} by ${name}`);
   });
-
   socket.on('joinRoom', ({ code, nickname }) => {
     const name = String(nickname).trim().slice(0, 16) || 'Tank';
     const upperCode = String(code).toUpperCase();
@@ -85,14 +75,12 @@ io.on('connection', (socket) => {
       socket.emit('roomError', 'ROOM FULL');
       return;
     }
-
     room.players.push({ id: socket.id, nickname: name, ready: false });
     socket.join(upperCode);
     socket.emit('roomJoined', getRoomState(upperCode));
     io.to(upperCode).emit('roomUpdate', getRoomState(upperCode));
     console.log(`[ROOM JOINED] ${name} joined ${upperCode}`);
   });
-
   socket.on('toggleReady', () => {
     for (const [code, room] of rooms) {
       const player = room.players.find(p => p.id === socket.id);
@@ -115,7 +103,6 @@ io.on('connection', (socket) => {
       }
     }
   });
-
   socket.on('leaveRoom', () => {
     for (const [code, room] of rooms) {
       const idx = room.players.findIndex(p => p.id === socket.id);
@@ -137,26 +124,15 @@ io.on('connection', (socket) => {
       }
     }
   });
-
-  socket.on('join', (nickname) => {
-    const name = String(nickname).trim().slice(0, 16) || 'Tank';
-    addPlayer(socket.id, name);
-    inputs[socket.id] = { up: false, down: false, left: false, right: false, angle: 0 };
-    socket.emit('joined', { id: socket.id });
-  });
-
   socket.on('input', (data) => {
     if (inputs[socket.id]) inputs[socket.id] = data;
   });
-
   socket.on('shoot', () => {
     shootBullet(socket.id);
   });
-
   socket.on('upgrade', (type) => {
     applyUpgrade(socket.id, type);
   });
-
   socket.on('disconnect', () => {
     removePlayer(socket.id);
     delete inputs[socket.id];
@@ -182,9 +158,7 @@ io.on('connection', (socket) => {
     console.log(`[DISCONNECTED] ${socket.id}`);
   });
 });
-
 const playerDeathCallbacks = new Map();
-
 function handlePlayerDeath(playerId) {
   io.to(playerId).emit('playerDied');
   
@@ -194,7 +168,6 @@ function handlePlayerDeath(playerId) {
     playerDeathCallbacks.delete(playerId);
   }, 3000));
 }
-
 setInterval(() => {
   for (const id in inputs) {
     movePlayer(id, inputs[id]);
@@ -207,19 +180,17 @@ setInterval(() => {
       handlePlayerDeath(pid);
     }
   });
-
   const state = getGameState();
   const leaderboard = getLeaderboard();
   io.emit('state', state);
   io.emit('leaderboard', leaderboard);
 }, 1000 / 30);
-
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 httpServer.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ╔═══════════════════════════════════════════╗
-║     TankAgar CLI Edition Server          ║
-║     Running on http://localhost:${PORT}      ║
+║     TankAgar Server Running            ║
+║     http://localhost:${PORT}                ║
 ╚═══════════════════════════════════════════╝
   `);
 });
