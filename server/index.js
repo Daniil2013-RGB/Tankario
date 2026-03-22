@@ -18,7 +18,7 @@ const io = new Server(httpServer, {
   pingInterval: 10000,
   pingTimeout: 5000,
 });
-app.use(express.static(join(__dirname, 'client')));
+app.use(express.static(join(__dirname, '../client')));
 initFood();
 const inputs = {};
 const rooms = new Map();
