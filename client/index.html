@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TankAgar // CLI Edition</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════════
+       LOGIN SCREEN
+       ════════════════════════════════════════════════════════ -->
+  <div id="login-screen">
+    <div class="login-container terminal-box">
+      <div class="terminal-inner">
+        <pre class="ascii-logo">
+ ██████╗ ██████╗ ██╗██╗     ██╗     ██╗███████╗██╗ ██████╗ ███╗   ██╗
+ ██╔══██╗██╔══██╗██║██║     ██║     ██║██╔════╝██║██╔═══██╗████╗  ██║
+ ██████╔╝██████╔╝██║██║     ██║     ██║███████╗██║██║   ██║██╔██╗ ██║
+ ██╔═══╝ ██╔══██╗██║██║     ██║     ██║╚════██║██║██║   ██║██║╚██╗██║
+ ██║     ██║  ██║██║███████╗███████╗██║███████║██║╚██████╔╝██║ ╚████║
+ ╚═╝     ╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚═╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
+        </pre>
+        <p class="subtitle">// TANK BATTLE ARENA v1.1 //</p>
+        
+        <div class="currency-display">
+          <span class="currency-icon">◆</span>
+          <span id="agarki-balance">0</span>
+          <span class="currency-label">AGARKI</span>
+        </div>
+        
+        <div class="login-box">
+          <div class="input-group">
+            <span class="input-label">login</span>
+            <input id="nickname-input" class="terminal-input" type="text" 
+                   placeholder="enter_nickname" maxlength="16" autofocus />
+          </div>
+          
+          <!-- TANK SELECTION -->
+          <div class="tank-selection">
+            <div class="section-label">// SELECT TANK //</div>
+            <div class="tank-grid">
+              <button class="tank-option selected" data-tank="basic">
+                <span class="tank-icon">▲</span>
+                <span class="tank-name">BASIC</span>
+                <span class="tank-price">FREE</span>
+              </button>
+              <button class="tank-option" data-tank="fast">
+                <span class="tank-icon">◄</span>
+                <span class="tank-name">SPEED</span>
+                <span class="tank-price">100 ◆</span>
+              </button>
+              <button class="tank-option" data-tank="heavy">
+                <span class="tank-icon">◆</span>
+                <span class="tank-name">HEAVY</span>
+                <span class="tank-price">150 ◆</span>
+              </button>
+              <button class="tank-option" data-tank="code">
+                <span class="tank-icon">⌘</span>
+                <span class="tank-name">CODE</span>
+                <span class="tank-price">500 ◆</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- MODE SELECTION -->
+          <div class="mode-selection-game">
+            <div class="section-label">// GAME MODE //</div>
+            <div class="mode-grid">
+              <button class="mode-btn selected" data-mode="agar">
+                <span class="mode-icon">◯</span>
+                <span class="mode-name">AGARIO</span>
+                <span class="mode-desc">Сбор, рост, арена</span>
+              </button>
+              <button class="mode-btn" data-mode="tanks">
+                <span class="mode-icon">▲</span>
+                <span class="mode-name">TANKS</span>
+                <span class="mode-desc">15v15, большая карта</span>
+              </button>
+            </div>
+          </div>
+          
+          <!-- DIFFICULTY SELECTION -->
+          <div class="difficulty-selection">
+            <div class="section-label">// DIFFICULTY //</div>
+            <div class="diff-grid">
+              <button class="diff-btn" data-diff="easy">EASY</button>
+              <button class="diff-btn selected" data-diff="medium">MEDIUM</button>
+              <button class="diff-btn" data-diff="hard">HARD</button>
+              <button class="diff-btn hardcore-btn" data-diff="hardcore">HARDCORE</button>
+            </div>
+          </div>
+          
+          <button id="play-bot-btn" class="terminal-btn bot-btn">
+            [ START GAME ]
+          </button>
+          
+          <span class="divider-text">// OR MULTIPLAYER //</span>
+          
+          <button id="create-btn" class="terminal-btn">
+            [ CREATE ROOM ]
+          </button>
+          
+          <div class="join-row">
+            <input id="room-code-input" class="terminal-input code-input" 
+                   type="text" placeholder="CODE" maxlength="4" />
+            <button id="join-btn" class="terminal-btn">JOIN</button>
+          </div>
+          
+          <div class="error-msg hidden" id="error-msg"></div>
+          
+          <div class="controls-info">
+            <span>WASD</span> move &nbsp;|&nbsp; <span>CLICK/SPACE</span> fire &nbsp;|&nbsp; <span>U</span> upgrades
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       LOBBY SCREEN
+       ════════════════════════════════════════════════════════ -->
+  <div id="lobby-screen" class="hidden">
+    <div class="lobby-container terminal-box">
+      <div class="terminal-inner">
+        <div class="lobby-header">
+          <span class="room-code-display" id="display-room-code">----</span>
+          <button id="copy-code-btn" class="copy-btn" title="Copy code">[ COPY ]</button>
+        </div>
+        
+        <div class="tank-preview" id="tank-preview"></div>
+        
+        <div class="player-list" id="players-list"></div>
+        
+        <div class="lobby-actions">
+          <button id="ready-btn" class="terminal-btn ready-btn">[ READY ]</button>
+          <button id="leave-btn" class="terminal-btn leave-btn">[ EXIT ]</button>
+        </div>
+        
+        <div class="waiting-msg" id="waiting-msg">// waiting for players... //</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       GAME UI
+       ════════════════════════════════════════════════════════ -->
+  <div id="game-ui" class="hidden">
+    
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <!-- Stats (left) -->
+      <div id="stats">
+        <span id="stat-tank-type">▸ BASIC</span>
+        <span id="stat-hp">HP: <span class="hp-bar"></span></span>
+        <span id="stat-score">SCORE: <span>0</span></span>
+        <span id="stat-level">LVL: <span>1</span></span>
+        <span id="stat-points">UPG: <span>0</span></span>
+      </div>
+      
+      <!-- Currency & Difficulty -->
+      <div class="game-info">
+        <div class="game-currency">
+          <span>◆</span>
+          <span id="game-agarki">0</span>
+        </div>
+        <div id="game-difficulty" class="game-diff"></div>
+        <div id="game-mode" class="game-mode"></div>
+      </div>
+      
+      <!-- Leaderboard (right) -->
+      <div id="leaderboard">
+        <div class="lb-title">TOP PLAYERS</div>
+        <ol id="leaderboard-list"></ol>
+      </div>
+    </div>
+    
+    <!-- WoT-style HUD (center bottom) -->
+    <div id="wot-hud" class="wot-hud">
+      <div class="hud-left">
+        <div class="hud-panel">
+          <div class="hud-panel-title">ЭКИПАЖ</div>
+          <div class="crew-member">
+            <span class="crew-icon">👤</span>
+            <span class="crew-name" id="crew-commander">Командир</span>
+            <span class="crew-skill">100%</span>
+          </div>
+          <div class="crew-member">
+            <span class="crew-icon">👤</span>
+            <span class="crew-name" id="crew-driver">Мехвод</span>
+            <span class="crew-skill">100%</span>
+          </div>
+          <div class="crew-member">
+            <span class="crew-icon">👤</span>
+            <span class="crew-name" id="crew-gunner">Наводчик</span>
+            <span class="crew-skill">100%</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="hud-center">
+        <div class="reload-bar" id="reload-bar">
+          <div class="reload-progress" id="reload-progress"></div>
+        </div>
+        <div class="speed-indicator" id="speed-indicator">
+          <span class="speed-value" id="speed-value">0</span>
+          <span class="speed-unit">км/ч</span>
+        </div>
+        <div class="ammo-counter" id="ammo-counter">
+          <span class="ammo-icon">●</span>
+          <span class="ammo-count" id="ammo-count">∞</span>
+        </div>
+      </div>
+      
+      <div class="hud-right">
+        <div class="hud-panel">
+          <div class="hud-panel-title">УРОН</div>
+          <div class="damage-indicator" id="damage-indicator">
+            <div class="dmg-row" id="dmg-dealt">
+              <span class="dmg-label">Нанесено:</span>
+              <span class="dmg-value" id="dmg-dealt-value">0</span>
+            </div>
+            <div class="dmg-row" id="dmg-taken">
+              <span class="dmg-label">Получено:</span>
+              <span class="dmg-value" id="dmg-taken-value">0</span>
+            </div>
+            <div class="dmg-row" id="kills">
+              <span class="dmg-label">Убийств:</span>
+              <span class="dmg-value" id="kills-value">0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Hit Indicator -->
+    <div id="hit-indicator" class="hit-indicator hidden">
+      <div class="hit-arrow hit-front">▲</div>
+      <div class="hit-arrow hit-back">▼</div>
+      <div class="hit-arrow hit-left">◄</div>
+      <div class="hit-arrow hit-right">►</div>
+    </div>
+    
+    <!-- BOTTOM BAR -->
+    <div class="bottom-bar">
+      <div class="weapon-info">
+        <span id="stat-damage">DMG: 8</span> | 
+        <span id="stat-speed">SPD: 3</span> | 
+        <span id="stat-type">TYPE: BASIC</span>
+      </div>
+      
+      <button id="exit-game-btn" class="terminal-btn exit-btn">[ EXIT ]</button>
+      
+      <div id="controls-hint">
+        <span>WASD</span> move | <span>CLICK</span> fire | <span>U</span> upgrades
+      </div>
+    </div>
+    
+    <!-- UPGRADES PANEL -->
+    <div id="upgrades" class="hidden">
+      <div class="upg-container terminal-box">
+        <div class="terminal-inner">
+          <div class="upg-title">// UPGRADES // <span id="upg-points-left"></span></div>
+          <div class="upg-grid">
+            <button class="upg-btn" data-type="speed">
+              <span class="upg-icon">▲</span>
+              <span class="upg-name">Speed</span>
+            </button>
+            <button class="upg-btn" data-type="size">
+              <span class="upg-icon">◆</span>
+              <span class="upg-name">Armor</span>
+            </button>
+            <button class="upg-btn" data-type="damage">
+              <span class="upg-icon">●</span>
+              <span class="upg-name">Damage</span>
+            </button>
+          </div>
+          <div class="upg-hint">// click to upgrade //</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DEATH OVERLAY -->
+  <div id="death-overlay" class="death-overlay hidden">
+    <div class="death-text">// UNIT DESTROYED //</div>
+    <div class="respawn-text">respawn in <span id="respawn-timer">3</span>s...</div>
+  </div>
+
+  <!-- CANVAS -->
+  <div id="canvas-container"></div>
+  
+  <!-- SCANLINES EFFECT -->
+  <div class="scanlines"></div>
+
+  <!-- FIREBASE SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+  
+  <!-- SOCKET.IO -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  
+  <!-- THREE.JS -->
+  <script type="importmap">
+    { "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js" } }
+  </script>
+  
+  <script type="module" src="main.js"></script>
+</body>
+</html>
