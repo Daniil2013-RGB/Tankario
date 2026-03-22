@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Tank battle arena with ASCII CLI aesthetic - multiplayer",
   "scripts": {
-    "start": "npm install && node server/index.js",
+    "start": "node server/index.js",
     "dev": "node server/index.js"
   },
   "dependencies": {
